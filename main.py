@@ -27,10 +27,13 @@ class Login(webapp2.RequestHandler):
     def get(self):
         template = env.get_template('/html/bootstrap_login.html')
         self.response.out.write(template.render())
+class Dashboard(webapp2.RequestHandler):
     def post(self):
-        pass
+        template = env.get_template('/html/bootstrap_dashboard.html')
+        self.response.out.write(template.render())
 
 
 app = webapp2.WSGIApplication([
     ('/', Login),
+    ('/dashboard', Dashboard)
 ], debug=True)
