@@ -28,42 +28,48 @@ env = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file
 
 class Login(webapp2.RequestHandler):
     def get(self):
-        template = env.get_template('/html/bootstrap_login.html')
-        self.response.out.write(template.render())
+        if (self.request.cookies.get('longWaveAuth') == 'True'):
+            self.redirect('/dashboard')
+        else:
+            template = env.get_template('/html/bootstrap_login.html')
+            self.response.out.write(template.render())
 
     def post(self):
         #Get username and password strings from login form post request
         loginEmail = self.request.get('email')
         loginPassword = self.request.get('password')
-
-        #query_result = userAccount.query(userAccount.user_id_local == google_user.user_id()).fetch()
         user_profile = models.User.query(models.User.email == loginEmail).get()
 
-        if(user_profile != None):
-            if(loginPassword == user_profile.password):
-                self.redirect('/dashboard')
-            else:
-                self.response.out.write("<h2>Invalid Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
-
+        if(user_profile != None) and (loginPassword == user_profile.password):
+            self.response.set_cookie('longWaveAuth', 'True', max_age=3600, path='/')
+            self.redirect('/dashboard')
 
         else:
+            self.response.delete_cookie('longWaveAuth')
             self.response.out.write("<h2>No Such Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
-
             ''' # Used to initially create login credentials in the datastore.
             new_user = models.User(email=loginEmail, password=loginPassword)
             user_key = newUser.put()
             self.response.out.write("Key: " + user_key.urlsafe())
             '''
 
+class Logout(webapp2.RequestHandler):
+    def get(self):
+        self.response.delete_cookie('longWaveAuth')
+        self.redirect('/login')
 
 class Dashboard(webapp2.RequestHandler):
     def get(self):
-        template = env.get_template('/html/bootstrap_dashboard.html')
-        self.response.out.write(template.render())
+        if(self.request.cookies.get('longWaveAuth') != 'True'):
+            self.redirect('/login')
+        else:
+            template = env.get_template('/html/bootstrap_dashboard.html')
+            self.response.out.write(template.render())
 
 
 app = webapp2.WSGIApplication([
     ('/', Login),
     ('/login', Login),
+    ('/logout', Logout),
     ('/dashboard', Dashboard)
 ], debug=True)
