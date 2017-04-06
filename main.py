@@ -40,10 +40,14 @@ class Login(webapp2.RequestHandler):
         user_profile = models.User.query(models.User.email == loginEmail).get()
 
         if(user_profile != None):
-            self.response.out.write("I Found Something!")
+            if(loginPassword == user_profile.password):
+                self.redirect('/dashboard')
+            else:
+                self.response.out.write("<h2>Invalid Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
+
 
         else:
-            self.response.out.write("<h2>Invalid Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
+            self.response.out.write("<h2>No Such Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
 
             ''' # Used to initially create login credentials in the datastore.
             new_user = models.User(email=loginEmail, password=loginPassword)
