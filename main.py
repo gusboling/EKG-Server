@@ -58,6 +58,25 @@ class Logout(webapp2.RequestHandler):
         self.response.delete_cookie('longWaveAuth')
         self.redirect('/login')
 
+class CreateUser(webapp2.RequestHandler):
+    def get(self):
+        template = env.get_template('/html/bootstrap_createuser.html')
+        self.response.out.write(template.render(message="What's your admin key?"))
+
+    def post(self):
+        new_email = self.request.get('email')
+        new_password = self.request.get('password')
+        security_key = self.request.get('key')
+        template = env.get_template('/html/bootstrap_createuser.html')
+
+        if(security_key == "gusIsAwesome"):
+            new_user = models.User(email=new_email, password=new_password)
+            user_key = new_user.put()
+            self.response.out.write(template.render(message="<span style='color:green'>User Created!</span>"))
+            
+        else:
+            self.response.out.write(template.render(message="<span style='color:red'>You're not an admin! Bugger off!</span>"))
+
 class Dashboard(webapp2.RequestHandler):
     def get(self):
         if(self.request.cookies.get('longWaveAuth') != 'True'):
@@ -71,5 +90,6 @@ app = webapp2.WSGIApplication([
     ('/', Login),
     ('/login', Login),
     ('/logout', Logout),
-    ('/dashboard', Dashboard)
+    ('/dashboard', Dashboard),
+    ('/createuser', CreateUser)
 ], debug=True)
