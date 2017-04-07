@@ -7,8 +7,8 @@ data.
 '''
 class Packet(ndb.Model):
     source = ndb.StringProperty() #Email or Phone number this packet originated from
-    sequence = ndb.IntegerProperty() #The
     body = ndb.StringProperty()
+    date = ndb.StringProperty()
 
 
 '''

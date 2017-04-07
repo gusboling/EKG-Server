@@ -1,5 +1,6 @@
 # Python Modules
 import json
+import time
 
 # Google App Engine Modules
 import logging
@@ -22,7 +23,8 @@ class LogSenderHandler(InboundMailHandler):
             logging.info("Body (Plain Text): %s", str(plaintext))
             ''' /DEBUGGING LOGS '''
 
-            newEntry = models.Packet(source=str(mail_message.sender), body=str(plaintext))
+            now = time.strftime("%c")
+            newEntry = models.Packet(source=str(mail_message.sender), body=str(plaintext), date=str(now))
             newKey = newEntry.put()
 
 

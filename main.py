@@ -26,6 +26,10 @@ import models
 #Global Variables
 env = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
+def standard_template():
+    std_dict = {}
+    return std_dict
+
 class Login(webapp2.RequestHandler):
     def get(self):
         if (self.request.cookies.get('longWaveAuth') == 'True'):
@@ -47,11 +51,6 @@ class Login(webapp2.RequestHandler):
         else:
             self.response.delete_cookie('longWaveAuth')
             self.response.out.write("<h2>No Such Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
-            ''' # Used to initially create login credentials in the datastore.
-            new_user = models.User(email=loginEmail, password=loginPassword)
-            user_key = newUser.put()
-            self.response.out.write("Key: " + user_key.urlsafe())
-            '''
 
 class Logout(webapp2.RequestHandler):
     def get(self):
@@ -73,7 +72,7 @@ class CreateUser(webapp2.RequestHandler):
             new_user = models.User(email=new_email, password=new_password)
             user_key = new_user.put()
             self.response.out.write(template.render(message="<span style='color:green'>User Created!</span>"))
-            
+
         else:
             self.response.out.write(template.render(message="<span style='color:red'>You're not an admin! Bugger off!</span>"))
 
@@ -82,8 +81,15 @@ class Dashboard(webapp2.RequestHandler):
         if(self.request.cookies.get('longWaveAuth') != 'True'):
             self.redirect('/login')
         else:
+            #Get all records, load into template array
+            record_query = models.Packet.query()
+            record_list = record_query.fetch()
+
+            template_values = standard_template()
+            template_values['record_list'] = record_list
+
             template = env.get_template('/html/bootstrap_dashboard.html')
-            self.response.out.write(template.render())
+            self.response.out.write(template.render(template_values))
 
 
 app = webapp2.WSGIApplication([
