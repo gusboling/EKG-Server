@@ -19,6 +19,7 @@ import os
 import webapp2
 import jinja2
 import logging
+from google.appengine.ext import ndb
 
 #LongWave Modules
 import models
@@ -91,11 +92,19 @@ class Dashboard(webapp2.RequestHandler):
             template = env.get_template('/html/bootstrap_dashboard.html')
             self.response.out.write(template.render(template_values))
 
+class RemoveRecord(webapp2.RequestHandler):
+    def post(self):
+        url_key = self.request.get('url_key')
+        record = ndb.Key(urlsafe=url_key).get()
+        record.key.delete()
+        self.redirect('/dashboard')
+
 
 app = webapp2.WSGIApplication([
     ('/', Login),
     ('/login', Login),
     ('/logout', Logout),
     ('/dashboard', Dashboard),
-    ('/createuser', CreateUser)
+    ('/createuser', CreateUser),
+    ('/removerecord', RemoveRecord)
 ], debug=True)

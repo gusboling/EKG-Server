@@ -94,6 +94,7 @@
                                         <th>Source</th>
                                         <th>Date Recieved</th>
                                         <th>Body</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -102,6 +103,12 @@
                                         <td class="sorting_1">{{record.source}}</td>
                                         <td>{{record.date}}</td>
                                         <td class="email">{{record.body}}</td>
+                                        <td>
+                                          <form id="tool_button" class="form-group" action="/removerecord" method="post">
+                                            <input type="hidden" value="{{record.key.urlsafe()}}" name="url_key">
+                                            <input class="btn btn-warning btn-xs" type="submit" value="Remove">
+                                          </form>
+                                        </td>
                                   </tr>
                                   {% endfor %}
                                 </tbody>
