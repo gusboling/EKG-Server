@@ -23,6 +23,7 @@ from google.appengine.ext import ndb
 
 #LongWave Modules
 import models
+import sampleData
 
 #Global Variables
 env = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -99,6 +100,16 @@ class RemoveRecord(webapp2.RequestHandler):
         record.key.delete()
         self.redirect('/dashboard')
 
+class ViewData(webapp2.RequestHandler):
+    def post(self):
+        if(self.request.cookies.get('longWaveAuth') != 'True'):
+            self.redirect('/login')
+
+        else:
+            template_values = standard_template()
+            template_values["sample"] = sampleData.test_one
+            template = env.get_template('/html/view_data.html')
+            self.response.out.write(template.render(template_values))
 
 app = webapp2.WSGIApplication([
     ('/', Login),
@@ -106,5 +117,6 @@ app = webapp2.WSGIApplication([
     ('/logout', Logout),
     ('/dashboard', Dashboard),
     ('/createuser', CreateUser),
-    ('/removerecord', RemoveRecord)
+    ('/removerecord', RemoveRecord),
+    ('/viewData', ViewData)
 ], debug=True)

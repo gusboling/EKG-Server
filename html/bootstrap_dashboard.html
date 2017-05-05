@@ -62,6 +62,8 @@
                         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
+                        <li><a href="/flot"><i class="fa fa-sign-out fa-fw"></i> Flot Testbed</a>
+                        </li>
                         <li><a href="/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         </li>
                     </ul>
@@ -93,7 +95,6 @@
                                     <tr>
                                         <th>Source</th>
                                         <th>Date Recieved</th>
-                                        <th>Body</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -102,9 +103,12 @@
                                   <tr class="gradeA odd" role="row">
                                         <td class="sorting_1">{{record.source}}</td>
                                         <td>{{record.date}}</td>
-                                        <td class="email">{{record.body}}</td>
                                         <td>
-                                          <form id="tool_button" class="form-group" action="/removerecord" method="post">
+                                          <form id="tool_button" class="form-group" action="/viewData" method="post" style="margin-right:10px;float:left">
+                                            <input type="hidden" value="{{record.key.urlsafe()}}" name="url_key">
+                                            <input class="btn btn-success btn-xs" type="submit" value="View Screening Results">
+                                          </form>
+                                          <form id="tool_button" class="form-group" action="/removerecord" method="post" style="float:left">
                                             <input type="hidden" value="{{record.key.urlsafe()}}" name="url_key">
                                             <input class="btn btn-warning btn-xs" type="submit" value="Remove">
                                           </form>
@@ -152,6 +156,20 @@
         });
     });
     </script>
+
+    <!-- Flot Charts JavaScript -->
+    <script src="/bootstrap_vendor/flot/excanvas.min.js"></script>
+    <script src="/bootstrap_vendor/flot/jquery.flot.js"></script>
+    <script src="/bootstrap_vendor/flot/jquery.flot.pie.js"></script>
+    <script src="/bootstrap_vendor/flot/jquery.flot.resize.js"></script>
+    <script src="/bootstrap_vendor/flot/jquery.flot.time.js"></script>
+    <script src="/bootstrap_vendor/flot-tooltip/jquery.flot.tooltip.min.js"></script>
+    <!--<script src="/rsrc/flot-data.js"></script>-->
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/js/sb-admin-2.js"></script>
+
+    <meta id="sampleData"  data-datapoints="{{sample}}">
 
 </body>
 
