@@ -80,10 +80,10 @@
             </div>
             <!-- /.row -->
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            {{readingDate}}
+                            <b>{{readingDate}}</b>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -94,6 +94,31 @@
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
+                </div>
+                <div class="col-lg-4">
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <b>Doctor Feedback</b>
+                    </div>
+                    <div class="panel-body">
+                      {% for comment in comment_list %}
+                      <div class="panel panel-default">
+                        <div class="panel-heading">Dr. Smith, M.D.</div>
+                        <div class="panel-body">{{comment}}</div>
+                      </div>
+                      {% endfor %}
+                      <form method="post" action="/sendFeedback">
+
+                        <div class="form-group">
+                          <label for="comment">Provide Feeback:</label>
+                          <textarea class="form-control" rows="5" id="comment" name="new_comment"></textarea>
+                        </div>
+
+                        <input type="hidden" value="{{urlsafe}}" name="url_key">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+
+                      </form>
+                    </div>
                 </div>
             </div>
             <!-- /.row -->

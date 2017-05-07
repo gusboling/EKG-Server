@@ -104,7 +104,7 @@
                                         <td class="sorting_1">{{record.source}}</td>
                                         <td>{{record.date}}</td>
                                         <td>
-                                          <form id="tool_button" class="form-group" action="/viewData" method="post" style="margin-right:10px;float:left">
+                                          <form id="tool_button" class="form-group" action="/viewData" method="get" style="margin-right:10px;float:left">
                                             <input type="hidden" value="{{record.key.urlsafe()}}" name="url_key">
                                             <input class="btn btn-success btn-xs" type="submit" value="View Screening Results">
                                           </form>

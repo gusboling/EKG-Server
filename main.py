@@ -41,7 +41,6 @@ def parseBody(bodyText):
 
     return dataArray
 
-
 class Login(webapp2.RequestHandler):
     def get(self):
         if (self.request.cookies.get('longWaveAuth') == 'True'):
@@ -88,7 +87,7 @@ class CreateUser(webapp2.RequestHandler):
         else:
             self.response.out.write(template.render(message="<span style='color:red'>You're not an admin! Bugger off!</span>"))
 
-class Dashboard(webapp2.RequestHandler):
+class ViewDashboard(webapp2.RequestHandler):
     def get(self):
         if(self.request.cookies.get('longWaveAuth') != 'True'):
             self.redirect('/login')
@@ -111,7 +110,7 @@ class RemoveRecord(webapp2.RequestHandler):
         self.redirect('/dashboard')
 
 class ViewData(webapp2.RequestHandler):
-    def post(self):
+    def get(self):
         if(self.request.cookies.get('longWaveAuth') != 'True'):
             self.redirect('/login')
 
@@ -123,16 +122,30 @@ class ViewData(webapp2.RequestHandler):
             template_values["sample"] = parseBody(record.body)
             template_values["patientName"] = "John A. Doe"
             template_values["readingDate"] =  record.date
+            template_values["urlsafe"] = record.key.urlsafe()
+            template_values["comment_list"] = list(record.doctorFeedback)
 
             template = env.get_template('/html/view_data.html')
             self.response.out.write(template.render(template_values))
+
+class SendFeedback(webapp2.RequestHandler):
+    def post(self):
+        url_key = self.request.get('url_key')
+        new_comment = self.request.get('new_comment')
+
+        record = ndb.Key(urlsafe=url_key).get()
+        record.doctorFeedback.append(new_comment)
+        record.put()
+
+        self.redirect('/viewData?url_key=' + url_key)
 
 app = webapp2.WSGIApplication([
     ('/', Login),
     ('/login', Login),
     ('/logout', Logout),
-    ('/dashboard', Dashboard),
+    ('/dashboard', ViewDashboard),
     ('/createuser', CreateUser),
     ('/removerecord', RemoveRecord),
+    ('/sendFeedback', SendFeedback),
     ('/viewData', ViewData)
 ], debug=True)
