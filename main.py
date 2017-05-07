@@ -32,6 +32,16 @@ def standard_template():
     std_dict = {}
     return std_dict
 
+def parseBody(bodyText):
+    bodyArray = bodyText.split(",")
+    dataArray = []
+
+    for numstr in bodyArray:
+        dataArray.append(float(numstr))
+
+    return dataArray
+
+
 class Login(webapp2.RequestHandler):
     def get(self):
         if (self.request.cookies.get('longWaveAuth') == 'True'):
@@ -106,8 +116,14 @@ class ViewData(webapp2.RequestHandler):
             self.redirect('/login')
 
         else:
+            url_key = self.request.get('url_key')
+            record = ndb.Key(urlsafe=url_key).get()
+
             template_values = standard_template()
-            template_values["sample"] = sampleData.test_one
+            template_values["sample"] = parseBody(record.body)
+            template_values["patientName"] = "John A. Doe"
+            template_values["readingDate"] =  record.date
+
             template = env.get_template('/html/view_data.html')
             self.response.out.write(template.render(template_values))
 
