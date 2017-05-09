@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>Longwave - View Data</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="/bootstrap_vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -59,8 +59,6 @@
                       <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                   </a>
                   <ul class="dropdown-menu dropdown-user">
-                      <li><a href="/flot"><i class="fa fa-sign-out fa-fw"></i> Flot Testbed</a>
-                      </li>
                       <li><a href="/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                       </li>
                   </ul>
@@ -103,8 +101,16 @@
                     <div class="panel-body">
                       {% for comment in comment_list %}
                       <div class="panel panel-default">
-                        <div class="panel-heading">Dr. Smith, M.D.</div>
-                        <div class="panel-body">{{comment}}</div>
+                        <div class="panel-heading">
+                          {{comment.author}}
+                          <div style="float: right; margin-top: -5px">
+                            <form action="/removecomment" method="get">
+                              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                              <input type="hidden" value="{{urlsafe}}" name="url_key">
+                              <input type="hidden" value="{{comment.author + ":" + comment.text}}" name="comment_text">
+                            </form></div>
+                        </div>
+                        <div class="panel-body">{{comment.text}}</div>
                       </div>
                       {% endfor %}
                       <form method="post" action="/sendFeedback">

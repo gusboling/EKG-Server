@@ -41,6 +41,25 @@ def parseBody(bodyText):
 
     return dataArray
 
+class Comment:
+    def __init__(self, author, text):
+        self.author = author
+        self.text = text
+
+def getCommentTuples(raw_comments):
+    commentObjList = []
+
+    for comment_string in raw_comments:
+        if comment_string.find(":") != -1:
+            author = comment_string.split(":")[0]
+            comment = comment_string.split(":")[1]
+            commentObjList.append(Comment(author, comment))
+        else:
+            commentObjList.append(Comment("Anonymous", comment_string))
+
+    return commentObjList
+
+
 class Login(webapp2.RequestHandler):
     def get(self):
         if (self.request.cookies.get('longWaveAuth') == 'True'):
@@ -57,11 +76,12 @@ class Login(webapp2.RequestHandler):
 
         if(user_profile != None) and (loginPassword == user_profile.password):
             self.response.set_cookie('longWaveAuth', 'True', max_age=3600, path='/')
+            self.response.set_cookie('longWaveUser', loginEmail, max_age=3600, path='/')
             self.redirect('/dashboard')
 
         else:
             self.response.delete_cookie('longWaveAuth')
-            self.response.out.write("<h2>No Such Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
+            self.response.out.write("<h2>Invalid Username/Password Combination</h2><br><a href=\"/login\">Return to Login</a>")
 
 class Logout(webapp2.RequestHandler):
     def get(self):
@@ -109,6 +129,20 @@ class RemoveRecord(webapp2.RequestHandler):
         record.key.delete()
         self.redirect('/dashboard')
 
+class RemoveComment(webapp2.RequestHandler):
+    def get(self):
+        url_key = self.request.get('url_key')
+        comment_text = self.request.get('comment_text')
+        record = ndb.Key(urlsafe=url_key).get()
+        old_comments = record.doctorFeedback
+
+        if comment_text in old_comments:
+            old_comments.remove(comment_text)
+
+        record.doctorFeedback = old_comments
+        record.put()
+        self.redirect('/viewData?url_key=' + url_key)
+
 class ViewData(webapp2.RequestHandler):
     def get(self):
         if(self.request.cookies.get('longWaveAuth') != 'True'):
@@ -123,7 +157,8 @@ class ViewData(webapp2.RequestHandler):
             template_values["patientName"] = "John A. Doe"
             template_values["readingDate"] =  record.date
             template_values["urlsafe"] = record.key.urlsafe()
-            template_values["comment_list"] = list(record.doctorFeedback)
+
+            template_values["comment_list"] = getCommentTuples(list(record.doctorFeedback))
 
             template = env.get_template('/html/view_data.html')
             self.response.out.write(template.render(template_values))
@@ -132,9 +167,10 @@ class SendFeedback(webapp2.RequestHandler):
     def post(self):
         url_key = self.request.get('url_key')
         new_comment = self.request.get('new_comment')
+        author = self.request.cookies.get('longWaveUser')
 
         record = ndb.Key(urlsafe=url_key).get()
-        record.doctorFeedback.append(new_comment)
+        record.doctorFeedback.append(author + ":" + new_comment)
         record.put()
 
         self.redirect('/viewData?url_key=' + url_key)
@@ -146,6 +182,7 @@ app = webapp2.WSGIApplication([
     ('/dashboard', ViewDashboard),
     ('/createuser', CreateUser),
     ('/removerecord', RemoveRecord),
+    ('/removecomment', RemoveComment),
     ('/sendFeedback', SendFeedback),
     ('/viewData', ViewData)
 ], debug=True)
