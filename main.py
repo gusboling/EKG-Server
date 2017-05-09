@@ -28,6 +28,11 @@ import sampleData
 #Global Variables
 env = jinja2.Environment(loader = jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
+class Comment:
+    def __init__(self, author, text):
+        self.author = author
+        self.text = text
+
 def standard_template():
     std_dict = {}
     return std_dict
@@ -37,14 +42,10 @@ def parseBody(bodyText):
     dataArray = []
 
     for numstr in bodyArray:
+        logging.info(numstr)
         dataArray.append(float(numstr))
 
     return dataArray
-
-class Comment:
-    def __init__(self, author, text):
-        self.author = author
-        self.text = text
 
 def getCommentTuples(raw_comments):
     commentObjList = []
@@ -58,7 +59,6 @@ def getCommentTuples(raw_comments):
             commentObjList.append(Comment("Anonymous", comment_string))
 
     return commentObjList
-
 
 class Login(webapp2.RequestHandler):
     def get(self):
@@ -77,7 +77,7 @@ class Login(webapp2.RequestHandler):
         if(user_profile != None) and (loginPassword == user_profile.password):
             self.response.set_cookie('longWaveAuth', 'True', max_age=3600, path='/')
             self.response.set_cookie('longWaveUser', loginEmail, max_age=3600, path='/')
-            self.redirect('/dashboard')
+            self.redirect('/regionalDashboard')
 
         else:
             self.response.delete_cookie('longWaveAuth')
@@ -107,11 +107,23 @@ class CreateUser(webapp2.RequestHandler):
         else:
             self.response.out.write(template.render(message="<span style='color:red'>You're not an admin! Bugger off!</span>"))
 
-class ViewDashboard(webapp2.RequestHandler):
+class RegionalDashboard(webapp2.RequestHandler):
     def get(self):
         if(self.request.cookies.get('longWaveAuth') != 'True'):
             self.redirect('/login')
         else:
+            template_values = standard_template()
+            template = env.get_template('/html/bootstrap_community.html')
+            self.response.out.write(template.render(template_values))
+
+class CommunityDashboard(webapp2.RequestHandler):
+    def get(self):
+        if(self.request.cookies.get('longWaveAuth') != 'True'):
+            self.redirect('/login')
+        else:
+            community = self.request.get('community')
+            logging.info(community)
+
             #Get all records, load into template array
             record_query = models.Packet.query()
             record_list = record_query.fetch()
@@ -154,7 +166,7 @@ class ViewData(webapp2.RequestHandler):
 
             template_values = standard_template()
             template_values["sample"] = parseBody(record.body)
-            template_values["patientName"] = "John A. Doe"
+            template_values["patientName"] = record.patientName
             template_values["readingDate"] =  record.date
             template_values["urlsafe"] = record.key.urlsafe()
 
@@ -179,7 +191,8 @@ app = webapp2.WSGIApplication([
     ('/', Login),
     ('/login', Login),
     ('/logout', Logout),
-    ('/dashboard', ViewDashboard),
+    ('/regionalDashboard', RegionalDashboard),
+    ('/dashboard', CommunityDashboard),
     ('/createuser', CreateUser),
     ('/removerecord', RemoveRecord),
     ('/removecomment', RemoveComment),

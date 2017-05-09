@@ -9,7 +9,7 @@ class Packet(ndb.Model):
     source = ndb.StringProperty() #Email or Phone number this packet originated from
     date = ndb.StringProperty() #Timestamp for when message was recieved
 
-    body = ndb.StringProperty() #The raw body of the text message
+    body = ndb.StringProperty(indexed=False) #The raw body of the text message
 
     patientName = ndb.StringProperty()
     doctorFeedback = ndb.StringProperty(repeated=True)

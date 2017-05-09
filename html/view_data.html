@@ -48,7 +48,7 @@
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="/dashboard">LongWave Viewer v0.5</a>
+              <a class="navbar-brand" href="/regionalDashboard">LongWave Viewer v0.5</a>
           </div>
           <!-- /.navbar-header -->
 
@@ -167,8 +167,10 @@
 
           function plot() {
               var sin = [];
+              count = 0;
               for (var i = 0; i < js_var["datapoints"].length; i++) {
-                  sin.push([ i, js_var["datapoints"][i] ]);
+                  sin.push([ count, js_var["datapoints"][i]]);
+                  count += 0.004
               }
 
               var options = {
@@ -177,15 +179,15 @@
                           show: true
                       },
                       points: {
-                          show: true
+                          show: false
                       }
                   },
                   grid: {
                       hoverable: true //IMPORTANT! this is needed for tooltip to work
                   },
                   yaxis: {
-                      min: -0.2,
-                      max: 0.2
+                      min: -1.0,
+                      max: 1.0
                   },
                   tooltip: true,
                   tooltipOpts: {
