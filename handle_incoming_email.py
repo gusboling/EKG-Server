@@ -36,7 +36,7 @@ class LogSenderHandler(InboundMailHandler):
             patient_ID = str(rand_list[0]) + str(rand_list[1]) + str(rand_list[2]) + "-" + str(rand_list[3]) + str(rand_list[4]) + str(rand_list[5]) + str(rand_list[6])
 
             now = time.strftime("%c")
-            newEntry = models.Packet(source=str(mail_message.sender), body=parsed_body, date=str(now), patientName="Patient #"+patient_ID)
+            newEntry = models.Packet(source=str(mail_message.sender), body=parsed_body, date=str(now), patientName="Patient #"+patient_ID, doctorFeedback="", afib_flag=False)
             newKey = newEntry.put()
 
 

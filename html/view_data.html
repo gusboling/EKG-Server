@@ -81,12 +81,25 @@
                 <div class="col-lg-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">
+                          <p>
+                            {% if afib_flag %}
+                            <h5 style="color:red"><b>FLAGGED FOR AFIB</b></h5>
+                            {% endif %}
                             <b>{{readingDate}}</b>
+                          </p>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
+                          <!--
+                            <div style="layout:inline-block; float:left; margin-right:20px">
+                              <p>Voltage (millivolts)</p>
+                            </div>
+                          -->
                             <div class="flot-chart">
                                 <div class="flot-chart-content" id="flot-line-chart"></div>
+                            </div>
+                            <div>
+                              <p style="margin-left: 375px">Time Elapsed (seconds)</p>
                             </div>
                         </div>
                         <!-- /.panel-body -->
@@ -118,6 +131,9 @@
                         <div class="form-group">
                           <label for="comment">Provide Feeback:</label>
                           <textarea class="form-control" rows="5" id="comment" name="new_comment"></textarea>
+                        </div>
+                        <div class="checkbox">
+                          <label><input type="checkbox" value="True" name="afib_flag">Atrial Fibrillation</label>
                         </div>
 
                         <input type="hidden" value="{{urlsafe}}" name="url_key">
@@ -166,10 +182,10 @@
           plot();
 
           function plot() {
-              var sin = [];
+              var voltages = [];
               count = 0;
               for (var i = 0; i < js_var["datapoints"].length; i++) {
-                  sin.push([ count, js_var["datapoints"][i]]);
+                  voltages.push([count, js_var["datapoints"][i]]);
                   count += 0.004
               }
 
@@ -201,14 +217,12 @@
 
               var plotObj = $.plot($("#flot-line-chart"),
                     [{
-                      data: sin,
+                      data: voltages,
                       label: "mV/t"
                     }],
                   options);
           }
       });
     </script>
-
 </body>
-
 </html>

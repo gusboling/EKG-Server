@@ -42,7 +42,7 @@ def parseBody(bodyText):
     dataArray = []
 
     for numstr in bodyArray:
-        logging.info(numstr)
+        #logging.info(numstr)
         dataArray.append(float(numstr))
 
     return dataArray
@@ -57,6 +57,10 @@ def getCommentTuples(raw_comments):
             commentObjList.append(Comment(author, comment))
         else:
             commentObjList.append(Comment("Anonymous", comment_string))
+
+        for comment in commentObjList:
+            if comment.author == "Anonymous":
+                commentObjList.remove(comment)
 
     return commentObjList
 
@@ -165,10 +169,12 @@ class ViewData(webapp2.RequestHandler):
             record = ndb.Key(urlsafe=url_key).get()
 
             template_values = standard_template()
+
             template_values["sample"] = parseBody(record.body)
             template_values["patientName"] = record.patientName
             template_values["readingDate"] =  record.date
             template_values["urlsafe"] = record.key.urlsafe()
+            template_values["afib_flag"] = record.afib_flag
 
             template_values["comment_list"] = getCommentTuples(list(record.doctorFeedback))
 
@@ -179,10 +185,17 @@ class SendFeedback(webapp2.RequestHandler):
     def post(self):
         url_key = self.request.get('url_key')
         new_comment = self.request.get('new_comment')
+
+        if len(self.request.get('afib_flag')) > 0:
+            afib_flag = True
+        else:
+            afib_flag = False
+
         author = self.request.cookies.get('longWaveUser')
 
         record = ndb.Key(urlsafe=url_key).get()
         record.doctorFeedback.append(author + ":" + new_comment)
+        record.afib_flag = afib_flag
         record.put()
 
         self.redirect('/viewData?url_key=' + url_key)

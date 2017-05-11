@@ -106,10 +106,13 @@
                                             <input type="hidden" value="{{record.key.urlsafe()}}" name="url_key">
                                             <input class="btn btn-success btn-xs" type="submit" value="View Screening Results">
                                           </form>
-                                          <form id="tool_button" class="form-group" action="/removerecord" method="post" style="float:left">
+                                          <form id="tool_button" class="form-group" action="/removerecord" method="post" style="float:left; margin-right:10px">
                                             <input type="hidden" value="{{record.key.urlsafe()}}" name="url_key">
                                             <input class="btn btn-warning btn-xs" type="submit" value="Remove">
                                           </form>
+                                          {% if record.afib_flag %}
+                                          <p style="color:red;margin-left:20px"><span class="	glyphicon glyphicon-exclamation-sign"></span><b> AFIB</b></p>
+                                          {% endif %}
                                         </td>
                                   </tr>
                                   {% endfor %}

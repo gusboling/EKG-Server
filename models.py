@@ -13,7 +13,7 @@ class Packet(ndb.Model):
 
     patientName = ndb.StringProperty()
     doctorFeedback = ndb.StringProperty(repeated=True)
-
+    afib_flag = ndb.BooleanProperty()
 
 '''
 CLASS:  User
